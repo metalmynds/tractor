@@ -12,7 +12,7 @@
 // express or implied. See the License for the specific language governing
 // permissions and limitations under the License.
 //
-package io.metalmynds.devicefarm;
+package io.metalmynds.tractor;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
@@ -47,24 +47,24 @@ import com.amazonaws.services.devicefarm.model.ScheduleRunRequest;
 import com.amazonaws.services.devicefarm.model.ScheduleRunResult;
 import com.amazonaws.services.devicefarm.model.ScheduleRunTest;
 import com.amazonaws.services.devicefarm.model.Upload;
-import io.metalmynds.devicefarm.frameworks.AppiumJavaTestNGTest;
-import io.metalmynds.devicefarm.frameworks.InstrumentationTest;
-import io.metalmynds.devicefarm.frameworks.XCTestUITest;
+import io.metalmynds.tractor.frameworks.AppiumJavaTestNGTest;
+import io.metalmynds.tractor.frameworks.InstrumentationTest;
+import io.metalmynds.tractor.frameworks.XCTestUITest;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import io.metalmynds.devicefarm.frameworks.AppiumWebJavaJUnitTest;
-import io.metalmynds.devicefarm.frameworks.AppiumWebJavaTestNGTest;
-import io.metalmynds.devicefarm.frameworks.AppiumWebPythonTest;
-import io.metalmynds.devicefarm.frameworks.AppiumJavaJUnitTest;
-import io.metalmynds.devicefarm.frameworks.AppiumPythonTest;
-import io.metalmynds.devicefarm.frameworks.CalabashTest;
-import io.metalmynds.devicefarm.frameworks.UIAutomationTest;
-import io.metalmynds.devicefarm.frameworks.UIAutomatorTest;
-import io.metalmynds.devicefarm.frameworks.XCTestTest;
+import io.metalmynds.tractor.frameworks.AppiumWebJavaJUnitTest;
+import io.metalmynds.tractor.frameworks.AppiumWebJavaTestNGTest;
+import io.metalmynds.tractor.frameworks.AppiumWebPythonTest;
+import io.metalmynds.tractor.frameworks.AppiumJavaJUnitTest;
+import io.metalmynds.tractor.frameworks.AppiumPythonTest;
+import io.metalmynds.tractor.frameworks.CalabashTest;
+import io.metalmynds.tractor.frameworks.UIAutomationTest;
+import io.metalmynds.tractor.frameworks.UIAutomatorTest;
+import io.metalmynds.tractor.frameworks.XCTestTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -118,7 +118,7 @@ public class AWSDeviceFarm {
 
         ClientConfiguration clientConfiguration = new ClientConfiguration().withUserAgent("AWS Device Farm - Jenkins v1.0");
         api = new AWSDeviceFarmClient(creds, clientConfiguration);
-        api.setServiceNameIntern("io/metalmynds/devicefarm");
+        api.setServiceNameIntern("io/metalmynds/tractor");
     }
 
     //// Builder Methods

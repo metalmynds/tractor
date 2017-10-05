@@ -12,19 +12,21 @@
 // express or implied. See the License for the specific language governing
 // permissions and limitations under the License.
 //
-package io.metalmynds.devicefarm.frameworks;
+package io.metalmynds.tractor.frameworks;
 
 /**
- * POJO class for a UI automation test.
+ * POJO class for an XCTest test.
  */
-public final class UIAutomationTest {
+public final class XCTestTest {
     private final String tests;
+    private final String filter;
 
     /**
      * Static builder class.
      */
     public static class Builder {
         private String tests;
+        private String filter;
 
         /**
          * Test setter.
@@ -38,12 +40,22 @@ public final class UIAutomationTest {
         }
 
         /**
+         * Filter setter.
+         * @param filter The filter to use on tests.
+         * @return The builder object.
+         */
+        public Builder withFilter(String filter) {
+            this.filter = filter;
+            return this;
+        }
+
+        /**
          * Build method.
          *
          * @return The new POJO.
          */
-        public UIAutomationTest build() {
-            return new UIAutomationTest(this);
+        public XCTestTest build() {
+            return new XCTestTest(this);
         }
     }
 
@@ -52,8 +64,9 @@ public final class UIAutomationTest {
      *
      * @param builder The builder to use.
      */
-    private UIAutomationTest(Builder builder) {
+    private XCTestTest(Builder builder) {
         this.tests = builder.tests;
+        this.filter = builder.filter;
     }
 
     /**
@@ -63,5 +76,13 @@ public final class UIAutomationTest {
      */
     public String getTests() {
         return this.tests;
+    }
+
+    /**
+     * Filter getter.
+     * @return The filter to use on tests.
+     */
+    public String getFilter() {
+        return this.filter;
     }
 }

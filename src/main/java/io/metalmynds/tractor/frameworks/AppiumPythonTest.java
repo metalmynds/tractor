@@ -12,12 +12,12 @@
 // express or implied. See the License for the specific language governing
 // permissions and limitations under the License.
 //
-package io.metalmynds.devicefarm.frameworks;
+package io.metalmynds.tractor.frameworks;
 
 /**
- * POJO class for a Web Appium Python test.
+ * POJO class for an Appium Python test.
  */
-public class AppiumWebPythonTest {
+public class AppiumPythonTest {
     private final String tests;
 
     /**
@@ -42,8 +42,8 @@ public class AppiumWebPythonTest {
          *
          * @return The new POJO.
          */
-        public AppiumWebPythonTest build() {
-            return new AppiumWebPythonTest(this);
+        public AppiumPythonTest build() {
+            return new AppiumPythonTest(this);
         }
     }
 
@@ -52,7 +52,7 @@ public class AppiumWebPythonTest {
      *
      * @param builder The builder to use.
      */
-    private AppiumWebPythonTest(Builder builder) {
+    private AppiumPythonTest(Builder builder) {
         this.tests = builder.tests;
     }
 

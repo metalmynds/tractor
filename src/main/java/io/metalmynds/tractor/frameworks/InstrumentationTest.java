@@ -12,37 +12,37 @@
 // express or implied. See the License for the specific language governing
 // permissions and limitations under the License.
 //
-package io.metalmynds.devicefarm.frameworks;
+package io.metalmynds.tractor.frameworks;
 
 /**
- * POJO class for a UI automator test.
+ * POJO class for an instrumentation test.
  */
-public class UIAutomatorTest {
-    private final String tests;
+public final class InstrumentationTest {
+    private final String artifact;
     private final String filter;
 
     /**
      * Static builder class.
      */
     public static class Builder {
-        private String tests;
+        private String artifact;
         private String filter;
 
         /**
-         * Test setter.
+         * Artifact setter.
          *
-         * @param tests Path to the tests to run.
+         * @param artifact Path to test artifact.
          * @return The builder object.
          */
-        public Builder withTests(String tests) {
-            this.tests = tests;
+        public Builder withArtifact(String artifact) {
+            this.artifact = artifact;
             return this;
         }
 
         /**
          * Filter setter.
          *
-         * @param filter Filter to apply to the tests.
+         * @param filter The filter to use on tests.
          * @return The builder object.
          */
         public Builder withFilter(String filter) {
@@ -55,8 +55,8 @@ public class UIAutomatorTest {
          *
          * @return The new POJO.
          */
-        public UIAutomatorTest build() {
-            return new UIAutomatorTest(this);
+        public InstrumentationTest build() {
+            return new InstrumentationTest(this);
         }
     }
 
@@ -65,24 +65,24 @@ public class UIAutomatorTest {
      *
      * @param builder The builder to use.
      */
-    private UIAutomatorTest(Builder builder) {
-        this.tests = builder.tests;
+    private InstrumentationTest(Builder builder) {
+        this.artifact = builder.artifact;
         this.filter = builder.filter;
     }
 
     /**
-     * Test getter.
+     * Artifact getter.
      *
-     * @return The path to the tests to run.
+     * @return The path to the test artifact.
      */
-    public String getTests() {
-        return this.tests;
+    public String getArtifact() {
+        return this.artifact;
     }
 
     /**
      * Filter getter.
      *
-     * @return The filter to apply to the tests.
+     * @return The filter to use on tests.
      */
     public String getFilter() {
         return this.filter;

@@ -12,19 +12,21 @@
 // express or implied. See the License for the specific language governing
 // permissions and limitations under the License.
 //
-package io.metalmynds.devicefarm.frameworks;
+package io.metalmynds.tractor.frameworks;
 
 /**
- * POJO class for an Appium Java JUnit test.
+ * POJO class for a UI automator test.
  */
-public class AppiumJavaJUnitTest {
+public class UIAutomatorTest {
     private final String tests;
+    private final String filter;
 
     /**
      * Static builder class.
      */
     public static class Builder {
         private String tests;
+        private String filter;
 
         /**
          * Test setter.
@@ -38,12 +40,23 @@ public class AppiumJavaJUnitTest {
         }
 
         /**
+         * Filter setter.
+         *
+         * @param filter Filter to apply to the tests.
+         * @return The builder object.
+         */
+        public Builder withFilter(String filter) {
+            this.filter = filter;
+            return this;
+        }
+
+        /**
          * Build method.
          *
          * @return The new POJO.
          */
-        public AppiumJavaJUnitTest build() {
-            return new AppiumJavaJUnitTest(this);
+        public UIAutomatorTest build() {
+            return new UIAutomatorTest(this);
         }
     }
 
@@ -52,8 +65,9 @@ public class AppiumJavaJUnitTest {
      *
      * @param builder The builder to use.
      */
-    private AppiumJavaJUnitTest(Builder builder) {
+    private UIAutomatorTest(Builder builder) {
         this.tests = builder.tests;
+        this.filter = builder.filter;
     }
 
     /**
@@ -63,5 +77,14 @@ public class AppiumJavaJUnitTest {
      */
     public String getTests() {
         return this.tests;
+    }
+
+    /**
+     * Filter getter.
+     *
+     * @return The filter to apply to the tests.
+     */
+    public String getFilter() {
+        return this.filter;
     }
 }
