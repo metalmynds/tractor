@@ -1,5 +1,5 @@
 # Tractor
-Amazon Device Farm API Wrapper for Executinng Tests and Capturing Artifacts.
+Amazon Device Farm API Wrapper for Executing Tests and Capturing Artifacts.
 
 This wrapper is heavily based upon the [Jenkins Device Farm Plugin](https://github.com/awslabs/aws-device-farm-jenkins-plugin).
 
