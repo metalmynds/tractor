@@ -18,35 +18,7 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
 import com.amazonaws.services.devicefarm.AWSDeviceFarmClient;
-import com.amazonaws.services.devicefarm.model.AccountSettings;
-import com.amazonaws.services.devicefarm.model.ArtifactCategory;
-import com.amazonaws.services.devicefarm.model.CreateUploadRequest;
-import com.amazonaws.services.devicefarm.model.DevicePool;
-import com.amazonaws.services.devicefarm.model.ExecutionConfiguration;
-import com.amazonaws.services.devicefarm.model.GetAccountSettingsRequest;
-import com.amazonaws.services.devicefarm.model.GetRunRequest;
-import com.amazonaws.services.devicefarm.model.GetRunResult;
-import com.amazonaws.services.devicefarm.model.GetUploadRequest;
-import com.amazonaws.services.devicefarm.model.GetUploadResult;
-import com.amazonaws.services.devicefarm.model.ListArtifactsRequest;
-import com.amazonaws.services.devicefarm.model.ListArtifactsResult;
-import com.amazonaws.services.devicefarm.model.ListDevicePoolsRequest;
-import com.amazonaws.services.devicefarm.model.ListDevicePoolsResult;
-import com.amazonaws.services.devicefarm.model.ListJobsRequest;
-import com.amazonaws.services.devicefarm.model.ListJobsResult;
-import com.amazonaws.services.devicefarm.model.ListProjectsRequest;
-import com.amazonaws.services.devicefarm.model.ListProjectsResult;
-import com.amazonaws.services.devicefarm.model.ListSuitesRequest;
-import com.amazonaws.services.devicefarm.model.ListSuitesResult;
-import com.amazonaws.services.devicefarm.model.ListTestsRequest;
-import com.amazonaws.services.devicefarm.model.ListTestsResult;
-import com.amazonaws.services.devicefarm.model.NotFoundException;
-import com.amazonaws.services.devicefarm.model.Project;
-import com.amazonaws.services.devicefarm.model.ScheduleRunConfiguration;
-import com.amazonaws.services.devicefarm.model.ScheduleRunRequest;
-import com.amazonaws.services.devicefarm.model.ScheduleRunResult;
-import com.amazonaws.services.devicefarm.model.ScheduleRunTest;
-import com.amazonaws.services.devicefarm.model.Upload;
+import com.amazonaws.services.devicefarm.model.*;
 import io.metalmynds.tractor.frameworks.AppiumJavaTestNGTest;
 import io.metalmynds.tractor.frameworks.InstrumentationTest;
 import io.metalmynds.tractor.frameworks.XCTestUITest;
@@ -220,6 +192,36 @@ public class AWSDeviceFarm {
         }
 
         throw new AWSDeviceFarmException(String.format("DevicePool '%s' not found.", devicePoolName));
+    }
+
+    /**
+     * Get Device Farm device list by Device Farm project and device pool name.
+     *
+     * @param project        The Device Farm project.
+     * @return The Device Farm device pool list.
+     * @throws AWSDeviceFarmException
+     */
+    public List<Device> getDevices(Project project, String devicePoolName) throws AWSDeviceFarmException {
+        List<DevicePool> pools = getDevicePools(project);
+
+        for (DevicePool dp : pools) {
+            if (dp.getName().equals(devicePoolName)) {
+                return api.listDevices(new ListDevicesRequest().withArn(dp.getArn())).getDevices();
+            }
+        }
+
+        throw new AWSDeviceFarmException(String.format("DevicePool '%s' not found.", devicePoolName));
+    }
+
+    /**
+     * Get Device Farm device list by Device Farm project and device pool name.
+     *
+     * @param devicePool  The device pool.
+     * @return The Device Farm pool device list.
+     * @throws AWSDeviceFarmException
+     */
+    public List<Device> getDevices(DevicePool devicePool) throws AWSDeviceFarmException {
+        return api.listDevices(new ListDevicesRequest().withArn(devicePool.getArn())).getDevices();
     }
 
     /**
@@ -397,6 +399,7 @@ public class AWSDeviceFarm {
 
     /**
      * Upload a test to Device Farm.
+     *
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
