@@ -203,6 +203,7 @@ public class AWSDeviceFarm {
 
     /**
      * Gets projects list of devices.
+     *
      * @param project The Device Farm project.
      * @return The Device Farm device list.
      * @throws AWSDeviceFarmException
@@ -213,6 +214,7 @@ public class AWSDeviceFarm {
 
     /**
      * Gets projects list of devices.
+     *
      * @param project The Device Farm project name.
      * @return The Device Farm device list.
      * @throws AWSDeviceFarmException
@@ -485,7 +487,6 @@ public class AWSDeviceFarm {
         FileEntity entity = new FileEntity(file);
         httpPut.setEntity(entity);
 
-        writeToLog(String.format("Uploading %s to S3", file.getName()));
         HttpResponse response = httpClient.execute(httpPut);
         if (response.getStatusLine().getStatusCode() != 200) {
             throw new AWSDeviceFarmException(String.format("Upload returned non-200 responses: %d", response.getStatusLine().getStatusCode()));
@@ -498,20 +499,20 @@ public class AWSDeviceFarm {
                 GetUploadResult describeUploadResult = api.getUpload(describeUploadRequest);
                 String status = describeUploadResult.getUpload().getStatus();
 
-                if ("SUCCEEDED".equalsIgnoreCase(status)) {
-                    writeToLog(String.format("Upload %s succeeded", file.getName()));
-                    break;
-                } else if ("FAILED".equalsIgnoreCase(status)) {
-                    writeToLog(String.format("Error message from device farm: '%s'", describeUploadResult.getUpload().getMetadata()));
-                    throw new AWSDeviceFarmException(String.format("Upload %s failed!", upload.getName()));
-                } else {
-                    try {
-                        writeToLog(String.format("Waiting for upload %s to be ready (current status: %s)", file.getName(), status));
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        writeToLog(String.format("Thread interrupted while waiting for the upload to complete"));
-                        throw e;
+                try {
+                    if ("SUCCEEDED".equalsIgnoreCase(status)) {
+                        break;
+                    } else if ("FAILED".equalsIgnoreCase(status)) {
+                        throw new UploadFailedException(describeUploadResult.getUpload().getMetadata());
+                    } else {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            throw e;
+                        }
                     }
+                } catch (Exception ex) {
+                    throw new AWSDeviceFarmException(String.format("Upload %s failed!", file.getAbsolutePath(), ex));
                 }
             }
         }
@@ -590,7 +591,7 @@ public class AWSDeviceFarm {
                 String extension = artifact.getExtension().replaceFirst("^\\.", "");
                 Path artifactTargetPath = Paths.get(tests.get(testArn).getAbsolutePath(), String.format("%s-%s.%s", artifact.getName(), id, extension));
                 URL artifactSourcePath = new URL(artifact.getUrl());
-                Files.write(artifactTargetPath,  IOUtils.toByteArray(artifactSourcePath.openStream()));
+                Files.write(artifactTargetPath, IOUtils.toByteArray(artifactSourcePath.openStream()));
                 artifactPaths.add(artifactTargetPath);
             }
         }
@@ -655,7 +656,6 @@ public class AWSDeviceFarm {
     }
 
 
-
     public ListJobsResult listJobs(String runArn) {
         ListJobsRequest request = new ListJobsRequest()
                 .withArn(runArn);
@@ -708,16 +708,4 @@ public class AWSDeviceFarm {
         }
     }
 
-    //// Helper Methods
-
-    /**
-     * Stupid log helper.
-     *
-     * @param message The message to log.
-     */
-    private void writeToLog(String message) {
-        if (log != null) {
-            log.println(String.format("[AWSDeviceFarm] %s", message));
-        }
-    }
 }

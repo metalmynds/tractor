@@ -15,19 +15,19 @@
 package io.metalmynds.tractor;
 
 /**
- * Exception class for the the Device Farm wrapper.
+ * Exception class for handling upload failures.
  */
-public class AWSDeviceFarmException extends Exception {
+public class UploadFailedException extends Exception {
     /**
      * Wrapper for generic Exceptions.
      *
      * @param message The message to add to the exception.
      */
-    public AWSDeviceFarmException(String message) {
+    public UploadFailedException(String message) {
         super(message);
     }
 
-    public AWSDeviceFarmException(String message, Throwable e) {
+    public UploadFailedException(String message, Throwable e) {
         super(message, e);
     }
 }
