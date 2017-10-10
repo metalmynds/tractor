@@ -573,7 +573,9 @@ public class AWSDeviceFarm {
         return api.listArtifacts(request);
     }
 
-    public Map<String,File> getArtifacts(String runArn, File destination) throws IOException, InterruptedException {
+    public List<Path> getArtifacts(String runArn, File destination) throws IOException, InterruptedException {
+
+        List<Path> artifactPaths = new ArrayList<>();
 
         Map<String, File> jobs = getJobs(runArn, destination);
         Map<String, File> suites = getSuites(runArn, jobs);
@@ -586,17 +588,12 @@ public class AWSDeviceFarm {
                 String testArn = arn.substring(0, arn.lastIndexOf("/"));
                 String id = arn.substring(arn.lastIndexOf("/") + 1);
                 String extension = artifact.getExtension().replaceFirst("^\\.", "");
-                Path artifactFilePath = Paths.get(tests.get(testArn).getAbsolutePath(), String.format("%s-%s.%s", artifact.getName(), id, extension));
-                Path artifactSourcePath = Paths.get(artifact.getUrl());
-                Files.write(artifactFilePath, Files.readAllBytes(artifactSourcePath));
+                Path artifactTargetPath = Paths.get(tests.get(testArn).getAbsolutePath(), String.format("%s-%s.%s", artifact.getName(), id, extension));
+                URL artifactSourcePath = new URL(artifact.getUrl());
+                Files.write(artifactTargetPath,  IOUtils.toByteArray(artifactSourcePath.openStream()));
+                artifactPaths.add(artifactTargetPath);
             }
         }
-
-        Map<String,File> artifactPaths = new HashMap<>(jobs);
-
-        artifactPaths.putAll(suites);
-
-        artifactPaths.putAll(tests);
 
         return artifactPaths;
     }
