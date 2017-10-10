@@ -472,7 +472,7 @@ public class AWSDeviceFarm {
      * @throws IOException
      * @throws AWSDeviceFarmException
      */
-    private Upload upload(File file, Project project, AWSDeviceFarmUploadType uploadType, Boolean synchronous) throws InterruptedException, IOException, AWSDeviceFarmException {
+    private Upload upload(File file, Project project, AWSDeviceFarmUploadType uploadType, Boolean synchronous) throws IOException, AWSDeviceFarmException {
         CreateUploadRequest appUploadRequest = new CreateUploadRequest()
                 .withName(file.getName())
                 .withProjectArn(project.getArn())
@@ -499,20 +499,16 @@ public class AWSDeviceFarm {
                 GetUploadResult describeUploadResult = api.getUpload(describeUploadRequest);
                 String status = describeUploadResult.getUpload().getStatus();
 
-                try {
-                    if ("SUCCEEDED".equalsIgnoreCase(status)) {
-                        break;
-                    } else if ("FAILED".equalsIgnoreCase(status)) {
-                        throw new UploadFailedException(describeUploadResult.getUpload().getMetadata());
-                    } else {
-                        try {
-                            Thread.sleep(5000);
-                        } catch (InterruptedException e) {
-                            throw e;
-                        }
+                if ("SUCCEEDED".equalsIgnoreCase(status)) {
+                    break;
+                } else if ("FAILED".equalsIgnoreCase(status)) {
+                    throw new AWSDeviceFarmException(String.format("Upload %s failed! Server Message: %s", file.getName(), describeUploadResult.getUpload().getMetadata()));
+                } else {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        throw new AWSDeviceFarmException("Wait for upload was interrupted!", e);
                     }
-                } catch (Exception ex) {
-                    throw new AWSDeviceFarmException(String.format("Upload %s failed!", file.getAbsolutePath(), ex));
                 }
             }
         }
