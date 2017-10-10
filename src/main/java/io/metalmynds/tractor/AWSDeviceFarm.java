@@ -586,8 +586,9 @@ public class AWSDeviceFarm {
                 String testArn = arn.substring(0, arn.lastIndexOf("/"));
                 String id = arn.substring(arn.lastIndexOf("/") + 1);
                 String extension = artifact.getExtension().replaceFirst("^\\.", "");
-                File artifactFilePath = new File(tests.get(testArn), String.format("%s-%s.%s", artifact.getName(), id, extension));
-                Files.write(artifactFilePath, Files.readAllBytes(Paths.get(artifact.getUrl()));
+                Path artifactFilePath = Paths.get(tests.get(testArn).getAbsolutePath(), String.format("%s-%s.%s", artifact.getName(), id, extension));
+                Path artifactSourcePath = Paths.get(artifact.getUrl());
+                Files.write(artifactFilePath, Files.readAllBytes(artifactSourcePath));
             }
         }
 
@@ -620,7 +621,7 @@ public class AWSDeviceFarm {
     }
 
     private Map<String, File> getTests(String runArn, Map<String, File> suites) throws IOException, InterruptedException {
-        Map<String, File> tests = new HashMap<String, FilePath>();
+        Map<String, File> tests = new HashMap<String, File>();
 
         String components[] = runArn.split(":");
         // constructing suite ARN for each job using the run ARN
