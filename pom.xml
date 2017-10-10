@@ -5,7 +5,8 @@
     <artifactId>devicefarm-tractor</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>Tractor is an Amazon Device Farm API Wrapper</name>
+    <name>Tractor Device Farm API Wrapper</name>
+    <description>Amazon Device Farm API Wrapper for Executing Tests and Capturing Artifacts</description>
     <url>https://github.com/metalmynds/tractor</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
