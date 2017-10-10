@@ -19,10 +19,13 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
 import com.amazonaws.services.devicefarm.AWSDeviceFarmClient;
 import com.amazonaws.services.devicefarm.model.*;
+import com.amazonaws.services.s3.transfer.Download;
+import com.amazonaws.util.IOUtils;
 import io.metalmynds.tractor.frameworks.AppiumJavaTestNGTest;
 import io.metalmynds.tractor.frameworks.InstrumentationTest;
 import io.metalmynds.tractor.frameworks.XCTestUITest;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.FileEntity;
@@ -41,8 +44,12 @@ import io.metalmynds.tractor.frameworks.XCTestTest;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * AWS Device Farm API wrapper class.
@@ -195,33 +202,23 @@ public class AWSDeviceFarm {
     }
 
     /**
-     * Get Device Farm device list by Device Farm project and device pool name.
-     *
-     * @param project        The Device Farm project.
-     * @return The Device Farm device pool list.
+     * Gets projects list of devices.
+     * @param project The Device Farm project.
+     * @return The Device Farm device list.
      * @throws AWSDeviceFarmException
      */
-    public List<Device> getDevices(Project project, String devicePoolName) throws AWSDeviceFarmException {
-        List<DevicePool> pools = getDevicePools(project);
-
-        for (DevicePool dp : pools) {
-            if (dp.getName().equals(devicePoolName)) {
-                return api.listDevices(new ListDevicesRequest().withArn(dp.getArn())).getDevices();
-            }
-        }
-
-        throw new AWSDeviceFarmException(String.format("DevicePool '%s' not found.", devicePoolName));
+    public List<Device> getProjectDevices(Project project) throws AWSDeviceFarmException {
+        return api.listDevices(new ListDevicesRequest().withArn(project.getArn())).getDevices();
     }
 
     /**
-     * Get Device Farm device list by Device Farm project and device pool name.
-     *
-     * @param devicePool  The device pool.
-     * @return The Device Farm pool device list.
+     * Gets projects list of devices.
+     * @param project The Device Farm project name.
+     * @return The Device Farm device list.
      * @throws AWSDeviceFarmException
      */
-    public List<Device> getDevices(DevicePool devicePool) throws AWSDeviceFarmException {
-        return api.listDevices(new ListDevicesRequest().withArn(devicePool.getArn())).getDevices();
+    public List<Device> getProjectDevices(String project) throws AWSDeviceFarmException {
+        return api.listDevices(new ListDevicesRequest().withArn(getProject(project).getArn())).getDevices();
     }
 
     /**
@@ -575,6 +572,91 @@ public class AWSDeviceFarm {
 
         return api.listArtifacts(request);
     }
+
+    public Map<String,File> getArtifacts(String runArn, File destination) throws IOException, InterruptedException {
+
+        Map<String, File> jobs = getJobs(runArn, destination);
+        Map<String, File> suites = getSuites(runArn, jobs);
+        Map<String, File> tests = getTests(runArn, suites);
+
+        for (ArtifactCategory category : new ArrayList<ArtifactCategory>(Arrays.asList(ArtifactCategory.values()))) {
+            ListArtifactsResult result = listArtifacts(runArn, category);
+            for (Artifact artifact : result.getArtifacts()) {
+                String arn = artifact.getArn().split(":")[6];
+                String testArn = arn.substring(0, arn.lastIndexOf("/"));
+                String id = arn.substring(arn.lastIndexOf("/") + 1);
+                String extension = artifact.getExtension().replaceFirst("^\\.", "");
+                File artifactFilePath = new File(tests.get(testArn), String.format("%s-%s.%s", artifact.getName(), id, extension));
+                Files.write(artifactFilePath, Files.readAllBytes(Paths.get(artifact.getUrl()));
+            }
+        }
+
+        Map<String,File> artifactPaths = new HashMap<>(jobs);
+
+        artifactPaths.putAll(suites);
+
+        artifactPaths.putAll(tests);
+
+        return artifactPaths;
+    }
+
+    private Map<String, File> getSuites(String runArn, Map<String, File> jobs) throws IOException, InterruptedException {
+        Map<String, File> suites = new HashMap<String, File>();
+        String components[] = runArn.split(":");
+        // constructing job ARN for each job using the run ARN
+        components[5] = "job";
+        for (Map.Entry<String, File> jobEntry : jobs.entrySet()) {
+            String jobArn = jobEntry.getKey();
+            components[6] = jobArn;
+            String fullJobArn = StringUtils.join(components, ":");
+            ListSuitesResult result = listSuites(fullJobArn);
+            for (Suite suite : result.getSuites()) {
+                String arn = suite.getArn().split(":")[6];
+                suites.put(arn, new File(jobs.get(jobArn), suite.getName()));
+                suites.get(arn).mkdirs();
+            }
+        }
+        return suites;
+    }
+
+    private Map<String, File> getTests(String runArn, Map<String, File> suites) throws IOException, InterruptedException {
+        Map<String, File> tests = new HashMap<String, FilePath>();
+
+        String components[] = runArn.split(":");
+        // constructing suite ARN for each job using the run ARN
+        components[5] = "suite";
+        for (Map.Entry<String, File> suiteEntry : suites.entrySet()) {
+            String suiteArn = suiteEntry.getKey();
+            components[6] = suiteArn;
+            String fullsuiteArn = StringUtils.join(components, ":");
+            ListTestsResult result = listTests(fullsuiteArn);
+            for (Test test : result.getTests()) {
+                String arn = test.getArn().split(":")[6];
+                tests.put(arn, new File(suites.get(suiteArn), test.getName()));
+                tests.get(arn).mkdirs();
+            }
+        }
+        return tests;
+    }
+
+    private Map<String, File> getJobs(String runArn, File resultsDir) throws IOException, InterruptedException {
+        Map<String, File> jobs = new HashMap<String, File>();
+        ListJobsResult result = listJobs(runArn);
+        for (Job job : result.getJobs()) {
+            String arn = job.getArn().split(":")[6];
+            String jobId = arn.substring(arn.lastIndexOf("/") + 1);
+            // Two jobs can have same name. Appending Os version information to job name
+            String osVersion = null;
+            if (job.getDevice() != null) {
+                osVersion = job.getDevice().getOs();
+            }
+            jobs.put(arn, new File(resultsDir, job.getName() + "-" + (osVersion != null ? osVersion : jobId)));
+            jobs.get(arn).mkdirs();
+        }
+        return jobs;
+    }
+
+
 
     public ListJobsResult listJobs(String runArn) {
         ListJobsRequest request = new ListJobsRequest()
