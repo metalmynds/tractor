@@ -8,46 +8,56 @@
     <name>Tractor Device Farm API Wrapper</name>
     <description>Amazon Device Farm API Wrapper for Executing Tests and Capturing Artifacts</description>
     <url>https://github.com/metalmynds/tractor</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://github.com/metalmynds/tractor.git</url>
+    </scm>
     <properties>
+
+        <!-- Dependencies -->
+        <aws.sdk.version>1.11.205</aws.sdk.version>
+        <commons.lang3.version>3.6</commons.lang3.version>
+        <apache.httpcomponents.version>4.4</apache.httpcomponents.version>
+        <junit.version>4.12</junit.version>
+        <maven.compiler.plugin.version>3.2</maven.compiler.plugin.version>
+
+        <!-- Build -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <compiler.version>1.8</compiler.version>
+
     </properties>
-    <repositories>
-        <repository>
-            <id>central</id>
-            <name>Maven Repository Switchboard</name>
-            <layout>default</layout>
-            <url>https://repo1.maven.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>1.11.205</version>
+            <version>${aws.sdk.version}</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-devicefarm</artifactId>
-            <version>1.11.205</version>
+            <version>${aws.sdk.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.6</version>
+            <version>${commons.lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.4</version>
+            <version>${apache.httpcomponents.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -56,10 +66,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
+                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${compiler.version}</source>
+                    <target>${compiler.version}</target>
                 </configuration>
             </plugin>
         </plugins>
