@@ -26,6 +26,7 @@
         <apache.httpcomponents.version>4.4</apache.httpcomponents.version>
         <junit.version>4.12</junit.version>
         <maven.compiler.plugin.version>3.2</maven.compiler.plugin.version>
+        <nexus.staging.plugin.version>1.1</nexus.staging.plugin.version>
 
         <!-- Build -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -72,7 +73,18 @@
                     <target>${compiler.version}</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${nexus.staging.plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <!-- The Base URL of Nexus instance where we want to stage -->
+                    <nexusUrl>http://localhost:8081/nexus/</nexusUrl>
+                    <!-- The server "id" element from settings to use authentication from -->
+                    <serverId>local-nexus</serverId>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
 </project>
