@@ -134,7 +134,7 @@ public class AWSDeviceFarm {
      *
      * @param projectName String name of the Device Farm project.
      * @return The Device Farm project.
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if project named is not found.
      */
     public Project getProject(String projectName) throws AWSDeviceFarmException {
         for (Project p : getProjects()) {
@@ -150,7 +150,7 @@ public class AWSDeviceFarm {
      *
      * @param projectName String name of the Device Farm project.
      * @return A List of the Device Farm device pools.
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if get device pool list fails, check projectName.
      */
     public List<DevicePool> getDevicePools(String projectName) throws AWSDeviceFarmException {
         return getDevicePools(getProject(projectName));
@@ -161,7 +161,6 @@ public class AWSDeviceFarm {
      *
      * @param project Device Farm Project.
      * @return A List of the Device Farm device pools.
-     * @throws AWSDeviceFarmException
      */
     public List<DevicePool> getDevicePools(Project project) {
         ListDevicePoolsResult poolsResult = api.listDevicePools(new ListDevicePoolsRequest().withArn(project.getArn()));
@@ -175,7 +174,7 @@ public class AWSDeviceFarm {
      * @param projectName    String name of the Device Farm project.
      * @param devicePoolName String name of the device pool.
      * @return The Device Farm device pool.
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if get device pool fails.
      */
     public DevicePool getDevicePool(String projectName, String devicePoolName) throws AWSDeviceFarmException {
         return getDevicePool(getProject(projectName), devicePoolName);
@@ -187,7 +186,7 @@ public class AWSDeviceFarm {
      * @param project        The Device Farm project.
      * @param devicePoolName String name of the device pool.
      * @return The Device Farm device pool.
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if get device pool fails.
      */
     public DevicePool getDevicePool(Project project, String devicePoolName) throws AWSDeviceFarmException {
         List<DevicePool> pools = getDevicePools(project);
@@ -206,7 +205,7 @@ public class AWSDeviceFarm {
      *
      * @param project The Device Farm project.
      * @return The Device Farm device list.
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if get project devices fails.
      */
     public List<Device> getProjectDevices(Project project) throws AWSDeviceFarmException {
         return api.listDevices(new ListDevicesRequest().withArn(project.getArn())).getDevices();
@@ -217,7 +216,7 @@ public class AWSDeviceFarm {
      *
      * @param project The Device Farm project name.
      * @return The Device Farm device list.
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if get project devices fails.
      */
     public List<Device> getProjectDevices(String project) throws AWSDeviceFarmException {
         return api.listDevices(new ListDevicesRequest().withArn(getProject(project).getArn())).getDevices();
@@ -229,10 +228,9 @@ public class AWSDeviceFarm {
      * @param project     The Device Farm project to upload to.
      * @param appArtifact String path to the app to be uploaded to Device Farm.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of application artifact is unrecognised or if upload fails.
      */
-    public Upload uploadApp(Project project, String appArtifact) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadApp(Project project, String appArtifact) throws AWSDeviceFarmException {
         AWSDeviceFarmUploadType type;
         if (appArtifact.toLowerCase().endsWith("apk")) {
             type = AWSDeviceFarmUploadType.ANDROID_APP;
@@ -251,10 +249,9 @@ public class AWSDeviceFarm {
      * @param project           The Device Farm project to upload to.
      * @param extraDataArtifact String path to the extra data to be uploaded to Device Farm.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of data file is not a zip archive.
      */
-    public Upload uploadExtraData(Project project, String extraDataArtifact) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadExtraData(Project project, String extraDataArtifact) throws AWSDeviceFarmException {
         AWSDeviceFarmUploadType type;
         if (extraDataArtifact.toLowerCase().endsWith("zip")) {
             type = AWSDeviceFarmUploadType.EXTERNAL_DATA;
@@ -271,10 +268,9 @@ public class AWSDeviceFarm {
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of test artifact is unrecognised or if upload fails.
      */
-    public Upload uploadTest(Project project, InstrumentationTest test) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadTest(Project project, InstrumentationTest test) throws AWSDeviceFarmException {
         return upload(project, test.getArtifact(), AWSDeviceFarmUploadType.INSTRUMENTATION);
     }
 
@@ -284,10 +280,9 @@ public class AWSDeviceFarm {
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of test artifact is unrecognised or if upload fails.
      */
-    public Upload uploadTest(Project project, CalabashTest test) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadTest(Project project, CalabashTest test) throws AWSDeviceFarmException {
         return upload(project, test.getFeatures(), AWSDeviceFarmUploadType.CALABASH);
     }
 
@@ -297,10 +292,9 @@ public class AWSDeviceFarm {
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of test artifact is unrecognised or if upload fails.
      */
-    public Upload uploadTest(Project project, UIAutomatorTest test) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadTest(Project project, UIAutomatorTest test) throws AWSDeviceFarmException {
         return upload(project, test.getTests(), AWSDeviceFarmUploadType.UIAUTOMATOR);
     }
 
@@ -310,10 +304,9 @@ public class AWSDeviceFarm {
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of test artifact is unrecognised or if upload fails.
      */
-    public Upload uploadTest(Project project, UIAutomationTest test) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadTest(Project project, UIAutomationTest test) throws AWSDeviceFarmException {
         return upload(project, test.getTests(), AWSDeviceFarmUploadType.UIAUTOMATION);
     }
 
@@ -323,10 +316,9 @@ public class AWSDeviceFarm {
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of test artifact is unrecognised or if upload fails.
      */
-    public Upload uploadTest(Project project, XCTestTest test) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadTest(Project project, XCTestTest test) throws AWSDeviceFarmException {
         return upload(project, test.getTests(), AWSDeviceFarmUploadType.XCTEST);
     }
 
@@ -336,10 +328,9 @@ public class AWSDeviceFarm {
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of test artifact is unrecognised or if upload fails.
      */
-    public Upload uploadTest(Project project, XCTestUITest test) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadTest(Project project, XCTestUITest test) throws AWSDeviceFarmException {
         return upload(project, test.getTests(), AWSDeviceFarmUploadType.XCTEST_UI);
     }
 
@@ -349,10 +340,9 @@ public class AWSDeviceFarm {
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of test artifact is unrecognised or if upload fails.
      */
-    public Upload uploadTest(Project project, AppiumJavaTestNGTest test) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadTest(Project project, AppiumJavaTestNGTest test) throws AWSDeviceFarmException {
         return upload(project, test.getTests(), AWSDeviceFarmUploadType.APPIUM_JAVA_TESTNG);
     }
 
@@ -362,10 +352,9 @@ public class AWSDeviceFarm {
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of test artifact is unrecognised or if upload fails.
      */
-    public Upload uploadTest(Project project, AppiumJavaJUnitTest test) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadTest(Project project, AppiumJavaJUnitTest test) throws AWSDeviceFarmException {
         return upload(project, test.getTests(), AWSDeviceFarmUploadType.APPIUM_JAVA_JUNIT);
     }
 
@@ -375,10 +364,9 @@ public class AWSDeviceFarm {
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of test artifact is unrecognised or if upload fails.
      */
-    public Upload uploadTest(Project project, AppiumPythonTest test) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadTest(Project project, AppiumPythonTest test) throws AWSDeviceFarmException {
         return upload(project, test.getTests(), AWSDeviceFarmUploadType.APPIUM_PYTHON);
     }
 
@@ -389,10 +377,9 @@ public class AWSDeviceFarm {
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of test artifact is unrecognised or if upload fails.
      */
-    public Upload uploadTest(Project project, AppiumWebJavaTestNGTest test) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadTest(Project project, AppiumWebJavaTestNGTest test) throws AWSDeviceFarmException {
         return upload(project, test.getTests(), AWSDeviceFarmUploadType.APPIUM_WEB_JAVA_TESTNG);
     }
 
@@ -402,10 +389,9 @@ public class AWSDeviceFarm {
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of test artifact is unrecognised or if upload fails.
      */
-    public Upload uploadTest(Project project, AppiumWebJavaJUnitTest test) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadTest(Project project, AppiumWebJavaJUnitTest test) throws AWSDeviceFarmException {
         return upload(project, test.getTests(), AWSDeviceFarmUploadType.APPIUM_WEB_JAVA_JUNIT);
     }
 
@@ -415,10 +401,9 @@ public class AWSDeviceFarm {
      * @param project The Device Farm project to upload to.
      * @param test    Test object containing relevant test information.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if type of test artifact is unrecognised or if upload fails.
      */
-    public Upload uploadTest(Project project, AppiumWebPythonTest test) throws InterruptedException, IOException, AWSDeviceFarmException {
+    public Upload uploadTest(Project project, AppiumWebPythonTest test) throws AWSDeviceFarmException {
         return upload(project, test.getTests(), AWSDeviceFarmUploadType.APPIUM_WEB_PYTHON);
     }
 
@@ -429,10 +414,10 @@ public class AWSDeviceFarm {
      * @param artifact   Possibly glob-y path to the file to be uploaded.
      * @param uploadType The type of upload (app/test/etc.).
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws IOException if upload is interrupted.
+     * @throws AWSDeviceFarmException if file is not found or artifact filename not specified.
      */
-    private Upload upload(Project project, String artifact, AWSDeviceFarmUploadType uploadType) throws InterruptedException, IOException, AWSDeviceFarmException {
+    private Upload upload(Project project, String artifact, AWSDeviceFarmUploadType uploadType) throws AWSDeviceFarmException {
         if (artifact == null || artifact.isEmpty()) {
             throw new AWSDeviceFarmException("Must have an artifact path.");
         }
@@ -454,10 +439,9 @@ public class AWSDeviceFarm {
      * @param project    The Device Farm project to upload to.
      * @param uploadType The type of upload (app/test/etc.).
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if upload fails or is interrupted.
      */
-    private Upload upload(File file, Project project, AWSDeviceFarmUploadType uploadType) throws InterruptedException, IOException, AWSDeviceFarmException {
+    private Upload upload(File file, Project project, AWSDeviceFarmUploadType uploadType) throws AWSDeviceFarmException {
         return upload(file, project, uploadType, true);
     }
 
@@ -469,10 +453,9 @@ public class AWSDeviceFarm {
      * @param uploadType  The type of upload (app/test/etc.).
      * @param synchronous Whether or not to wait for the upload to complete before returning.
      * @return The Device Farm Upload object.
-     * @throws IOException
-     * @throws AWSDeviceFarmException
+     * @throws AWSDeviceFarmException if upload fails or is interrupted.
      */
-    private Upload upload(File file, Project project, AWSDeviceFarmUploadType uploadType, Boolean synchronous) throws IOException, AWSDeviceFarmException {
+    private Upload upload(File file, Project project, AWSDeviceFarmUploadType uploadType, Boolean synchronous) throws  AWSDeviceFarmException {
         CreateUploadRequest appUploadRequest = new CreateUploadRequest()
                 .withName(file.getName())
                 .withProjectArn(project.getArn())
@@ -487,7 +470,14 @@ public class AWSDeviceFarm {
         FileEntity entity = new FileEntity(file);
         httpPut.setEntity(entity);
 
-        HttpResponse response = httpClient.execute(httpPut);
+        HttpResponse response;
+
+        try {
+            response = httpClient.execute(httpPut);
+        } catch (IOException ex) {
+            throw new AWSDeviceFarmException("Upload failed to execute!", ex);
+        }
+
         if (response.getStatusLine().getStatusCode() != 200) {
             throw new AWSDeviceFarmException(String.format("Upload returned non-200 responses: %d", response.getStatusLine().getStatusCode()));
         }
@@ -519,11 +509,12 @@ public class AWSDeviceFarm {
     /**
      * Schedule a test run on Device Farm.
      *
-     * @param projectArn    The ARN of the Device Farm project to run the test on.
-     * @param name          The name of the test run.
-     * @param appArn        The ARN of the app to test.
-     * @param devicePoolArn The ARN of the device pool to test against.
-     * @param test          The run test.
+     * @param projectArn       The ARN of the Device Farm project to run the test on.
+     * @param name              The name of the test run.
+     * @param appArn            The ARN of the app to test.
+     * @param devicePoolArn     The ARN of the device pool to test against.
+     * @param test              The run test.
+     * @param jobTimeoutMinutes The maximum run time before automatic termination.
      * @param configuration The run configuration.
      * @return The result of the schedle run.
      */
@@ -703,5 +694,4 @@ public class AWSDeviceFarm {
             return null;
         }
     }
-
 }

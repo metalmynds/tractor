@@ -26,7 +26,9 @@
         <apache.httpcomponents.version>4.4</apache.httpcomponents.version>
         <junit.version>4.12</junit.version>
         <maven.compiler.plugin.version>3.2</maven.compiler.plugin.version>
-        <nexus.staging.plugin.version>1.1</nexus.staging.plugin.version>
+        <nexus.staging.plugin.version>1.6.7</nexus.staging.plugin.version>
+        <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
+        <maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
 
         <!-- Build -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -34,6 +36,15 @@
         <compiler.version>1.8</compiler.version>
 
     </properties>
+
+    <!-- Snapshot Repository -->
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -66,6 +77,32 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven.source.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
@@ -79,10 +116,9 @@
                 <version>${nexus.staging.plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <!-- The Base URL of Nexus instance where we want to stage -->
-                    <nexusUrl>http://localhost:8081/nexus/</nexusUrl>
-                    <!-- The server "id" element from settings to use authentication from -->
-                    <serverId>local-nexus</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <serverId>ossrh</serverId>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
         </plugins>
