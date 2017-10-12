@@ -1,4 +1,4 @@
-# Tractor ![alt text](https://travis-ci.org/metalmynds/tractor.svg?branch=master)
+# Tractor ![Build Status](https://travis-ci.org/metalmynds/tractor.svg?branch=master)
 Amazon Device Farm API Wrapper for Executing Tests and Capturing Artifacts.
 
 This wrapper is heavily based upon the [Jenkins Device Farm Plugin](https://github.com/awslabs/aws-device-farm-jenkins-plugin).
